@@ -3,8 +3,7 @@ const moles = document.querySelectorAll('.mole');
 const startButton = document.querySelector('#start');
 const score = document.querySelector("#score");
 const timerDisplay = document.querySelector("#timer");
-const song = new Audio("https://github.com/Thinkful-Ed/js-dev-final-capstone-starter/blob/main/assets/molesong.mp3?raw=true");
-const audioHit = new Audio("https://github.com/Thinkful-Ed/js-dev-final-capstone-starter/blob/main/assets/hit.mp3?raw=true")
+const song = new Audio("../assets/molesong.mp3?raw=true");
 
 let time = 0;
 let timer;
@@ -221,7 +220,6 @@ function startTimer() {
 */
 function whack(event) {
   // TODO: Write your code here.
-  playAudio(audioHit);
   updateScore();
   return points;
 }
