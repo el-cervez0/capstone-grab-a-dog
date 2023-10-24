@@ -1,9 +1,10 @@
 const holes = document.querySelectorAll('.hole');
 const moles = document.querySelectorAll('.mole');
 const startButton = document.querySelector('#start');
-// TODO: Add the missing query selectors:
-const score; // Use querySelector() to get the score element
-const timerDisplay; // use querySelector() to get the timer element.
+const score = document.querySelector("#score");
+const timerDisplay = document.querySelector("#timer");
+const song = new Audio("https://github.com/Thinkful-Ed/js-dev-final-capstone-starter/blob/main/assets/molesong.mp3?raw=true");
+const audioHit = new Audio("https://github.com/Thinkful-Ed/js-dev-final-capstone-starter/blob/main/assets/hit.mp3?raw=true")
 
 let time = 0;
 let timer;
@@ -21,7 +22,7 @@ let difficulty = "hard";
  *
  */
 function randomInteger(min, max) {
-  // return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 /**
@@ -41,7 +42,13 @@ function randomInteger(min, max) {
  */
 function setDelay(difficulty) {
   // TODO: Write your code here.
-  
+  if (difficulty === "easy") {
+    return 1500
+  } else if (difficulty === "normal") {
+    return 1000
+  } else if (difficulty === "hard") {
+    return randomInteger(600, 1200)
+  }
 }
 
 /**
@@ -60,7 +67,13 @@ function setDelay(difficulty) {
  */
 function chooseHole(holes) {
   // TODO: Write your code here.
-
+    const spot = randomInteger(0, 8);
+    const hole = holes[spot];
+    if (hole === lastHole) {
+      return chooseHole(holes)
+    }
+    lastHole = hole;
+    return hole;
 }
 
 /**
@@ -85,7 +98,12 @@ function chooseHole(holes) {
 */
 function gameOver() {
   // TODO: Write your code here
-  
+  if (time > 0) {
+    let timeoutID = showUp();
+    return timeoutID
+  } else {
+    return stopGame();
+  }
 }
 
 /**
@@ -98,8 +116,8 @@ function gameOver() {
 *
 */
 function showUp() {
-  let delay = 0; // TODO: Update so that it uses setDelay()
-  const hole = 0;  // TODO: Update so that it use chooseHole()
+  const delay = setDelay(difficulty); // TODO: Update so that it uses setDelay()
+  const hole = chooseHole(holes);  // TODO: Update so that it use chooseHole()
   return showAndHide(hole, delay);
 }
 
@@ -113,12 +131,13 @@ function showUp() {
 */
 function showAndHide(hole, delay){
   // TODO: call the toggleVisibility function so that it adds the 'show' class.
+  toggleVisibility(hole);
   
   const timeoutID = setTimeout(() => {
     // TODO: call the toggleVisibility function so that it removes the 'show' class when the timer times out.
-    
+    toggleVisibility(hole)
     gameOver();
-  }, 0); // TODO: change the setTimeout delay to the one provided as a parameter
+  }, delay); // TODO: change the setTimeout delay to the one provided as a parameter
   return timeoutID;
 }
 
@@ -130,7 +149,7 @@ function showAndHide(hole, delay){
 */
 function toggleVisibility(hole){
   // TODO: add hole.classList.toggle so that it adds or removes the 'show' class.
-  
+  hole.classList.toggle("show");
   return hole;
 }
 
@@ -146,7 +165,8 @@ function toggleVisibility(hole){
 */
 function updateScore() {
   // TODO: Write your code here
-
+  points++;
+  score.textContent = points;
   return points;
 }
 
@@ -159,8 +179,8 @@ function updateScore() {
 */
 function clearScore() {
   // TODO: Write your code here
-  // points = 0;
-  // score.textContent = points;
+  points = 0;
+  score.textContent = points;
   return points;
 }
 
@@ -172,7 +192,10 @@ function clearScore() {
 function updateTimer() {
   // TODO: Write your code here.
   // hint: this code is provided to you in the instructions.
-  
+  if (time > 0) {
+    time -= 1;
+    timerDisplay.textContent = time;
+  } 
   return time;
 }
 
@@ -184,7 +207,7 @@ function updateTimer() {
 */
 function startTimer() {
   // TODO: Write your code here
-  // timer = setInterval(updateTimer, 1000);
+  timer = setInterval(updateTimer, 1000);
   return timer;
 }
 
@@ -198,7 +221,8 @@ function startTimer() {
 */
 function whack(event) {
   // TODO: Write your code here.
-  // call updateScore()
+  playAudio(audioHit);
+  updateScore();
   return points;
 }
 
@@ -209,7 +233,9 @@ function whack(event) {
 */
 function setEventListeners(){
   // TODO: Write your code here
-
+  moles.forEach(
+    mole => mole.addEventListener('click', whack)
+  )
   return moles;
 }
 
@@ -224,14 +250,26 @@ function setDuration(duration) {
   return time;
 }
 
+const playAudio = audioObject => {
+  audioObject.play();
+}
+
+const loopAudio = audioObject => {
+  audioObject.loop = true;
+  playAudio(audioObject);
+}
+
+const play = () => {
+  playAudio(song);
+}
+
 /**
 *
 * This function is called when the game is stopped. It clears the
 * timer using clearInterval. Returns "game stopped".
 *
 */
-function stopGame(){
-  // stopAudio(song);  //optional
+function stopGame() {
   clearInterval(timer);
   return "game stopped";
 }
@@ -242,13 +280,17 @@ function stopGame(){
 * is clicked.
 *
 */
-function startGame(){
-  //setDuration(10);
-  //showUp();
-  return "game started";
+function startGame() {
+  play();
+  clearScore();
+  setEventListeners();
+  setDuration(10);
+  startTimer();
+  showUp();
+  return "game started"
 }
 
-startButton.addEventListener("click", startGame);
+startButton.addEventListener("click", startGame); 
 
 
 // Please do not modify the code below.
