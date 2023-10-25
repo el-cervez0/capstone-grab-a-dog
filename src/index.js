@@ -279,7 +279,7 @@ function stopGame() {
 *
 */
 function startGame() {
-  play();
+  loopAudio();
   clearScore();
   setEventListeners();
   setDuration(10);
